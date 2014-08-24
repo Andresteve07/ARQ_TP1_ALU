@@ -52,7 +52,7 @@ function [8:0] funcion_alu;
 		6'b000010: funcion_alu = a >> 1;
 		6'b100111: funcion_alu = ~(a | b);
 		default : begin 
-			funcion_alu=`OP:MAX'bxxxxx; 
+			funcion_alu=`OP_MAX'bxxxxx; 
 			$display("Operacion Ilegal Detectada!!"); 
 		end
 	endcase
