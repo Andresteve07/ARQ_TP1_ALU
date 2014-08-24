@@ -18,13 +18,17 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
+`define BUS 8 				//ancho del bus de datos 
+`define BUS_MAX `BUS-1 	//ancho del bus de datos MENOS UNO
+`define OP 6 				//cantidad de bits de operaciones
+`define OP_MAX `OP-1 	//cantidad MENOS UNO de bits de operaciones
 module calculadora(entrada,boton_a,boton_b,boton_op,rdo,carry,zero);
-	input [7:0] entrada;
+	input [`BUS_MAX:0] entrada;
 	input boton_a,boton_b,boton_op;
-	output [7:0] rdo;
+	output [`BUS_MAX:0] rdo;
 	output carry,zero;
-	wire [7:0] a,b;
-	wire [5:0] op;
+	wire [`BUS_MAX:0] a,b;
+	wire [`OP_MAX:0] op;
 	cargador inst_cargador(.entrada(entrada),
 									.boton_a(boton_a),
 									.boton_b(boton_b),

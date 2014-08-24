@@ -18,15 +18,20 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
+`define BUS 8 				//ancho del bus de datos 
+`define BUS_MAX `BUS-1 	//ancho del bus de datos MENOS UNO
+`define OP 6 				//cantidad de bits de operaciones
+`define OP_MAX `OP-1 	//cantidad MENOS UNO de bits de operacionesefine.v"
+
 module cargador(entrada,boton_a,boton_b,boton_op,a,b,op);
 	 
-	 input [7:0] entrada;
+	 input [`BUS_MAX:0] entrada;
 	 input boton_a,boton_b,boton_op;
-	 output reg [7:0] a,b;
-	 output reg [5:0] op;
+	 output reg [`BUS_MAX:0] a,b;
+	 output reg [`OP_MAX:0] op;
 	 
-//	 reg [7:0] a_val,b_val;
-//	 reg [5:0] op_val;
+//	 reg [`BUS_MAX:0] a_val,b_val;
+//	 reg [`OP_MAX:0] op_val;
 //	 
 //	 initial a_val = 8'b00000000;
 //	 initial b_val = 8'b00000000;
@@ -63,7 +68,7 @@ module cargador(entrada,boton_a,boton_b,boton_op,a,b,op);
 				begin
 //					b = b;
 //					a = a;
-					op = entrada[5:0];
+					op = entrada[`OP_MAX:0];
 				end
 //			else
 //				begin

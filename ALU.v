@@ -18,26 +18,30 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
+`define BUS 8 				//ancho del bus de datos 
+`define BUS_MAX `BUS-1 	//ancho del bus de datos MENOS UNO
+`define OP 6 				//cantidad de bits de operaciones
+`define OP_MAX `OP-1 	//cantidad MENOS UNO de bits de operaciones
 module alu(a,b,op,rdo,carry,zero); 
 //module alu(a,b,cin,alu,carry,zero,op);
-	input [7:0] a,b; 
+	input [`BUS_MAX:0] a,b; 
 	//input cin ; 
-	output [7:0] rdo; 
+	output [`BUS_MAX:0] rdo; 
 	output carry; 
 	output zero ; 
-	input [5:0] op ; 
+	input [`OP_MAX:0] op ; 
 	wire [8:0] resultado;
 
 	assign resultado = funcion_alu(a,b,op); 
 	//assign result = funcion_alu(a,b,cin,op); 
-	assign rdo = resultado[7:0]; 
+	assign rdo = resultado[`BUS_MAX:0]; 
 	assign carry = resultado[8] ; 
 	assign zero = bandera_Z(resultado) ; 
 
 function [8:0] funcion_alu; 
-	input [7:0] a,b ; 
+	input [`BUS_MAX:0] a,b ; 
 	//input cin ; 
-	input [5:0] op ; 
+	input [`OP_MAX:0] op ; 
 	case ( op ) 
 		6'b100000: funcion_alu = a + b;
 		6'b100010: funcion_alu = a - b;
@@ -48,7 +52,7 @@ function [8:0] funcion_alu;
 		6'b000010: funcion_alu = a >> 1;
 		6'b100111: funcion_alu = ~(a | b);
 		default : begin 
-			funcion_alu=5'bxxxxx; 
+			funcion_alu=`OP:MAX'bxxxxx; 
 			$display("Operacion Ilegal Detectada!!"); 
 		end
 	endcase
