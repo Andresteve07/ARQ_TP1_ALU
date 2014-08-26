@@ -1,0 +1,31 @@
+#entrada,boton_a,boton_b,boton_op,rdo,carry,zero
+#NET "reloj_placa" LOC = "B8";
+
+
+NET "entrada<7>" LOC ="N3";
+NET "entrada<6>" LOC ="E2";
+NET "entrada<5>" LOC ="F3";
+NET "entrada<4>" LOC ="G3";
+NET "entrada<3>" LOC ="B4";
+NET "entrada<2>" LOC ="k3";
+NET "entrada<1>" LOC ="L3";
+NET "entrada<0>" LOC ="P11";
+
+#NET "boton_a" LOC ="G12";
+#NET "boton_b" LOC ="C11";
+#NET "boton_op" LOC ="M4";
+
+NET "boton_a" LOC ="A7";
+NET "boton_b" LOC ="M4";
+NET "boton_op" LOC ="C11";
+
+#NET "llaves_operacion<3>" LOC ="A7";
+
+NET "rdo<0>" LOC ="M5";
+NET "rdo<1>" LOC ="M11";
+NET "rdo<2>" LOC ="P7";
+NET "rdo<3>" LOC ="P6";
+NET "rdo<4>" LOC ="N5";
+NET "rdo<5>" LOC ="N4";
+NET "rdo<6>" LOC ="P4";
+NET "rdo<7>" LOC ="G1";
