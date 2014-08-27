@@ -18,50 +18,50 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-`define BUS_DAT 8 				//ancho del bus de datos 
-`define BUS_DAT_MSB `BUS_DAT-1 	//ancho del bus de datos MENOS UNO
-`define BUS_OP 6 				//cantidad de bits de operaciones
-`define BUS_OP_MSB `BUS_OP-1 	//cantidad MENOS UNO de bits de operaciones
-module alu(a,b,op,rdo,carry,zero); 
-//module alu(a,b,cin,alu,carry,zero,op);
-	input [`BUS_DAT_MSB:0] a,b; 
-	//input cin ; 
-	output [`BUS_DAT_MSB:0] rdo; 
+`include "definiciones.vh"
+
+module alu(a,b,op,rdo,carry,zero);
+
+	parameter b_dat = `BUS_DAT;
+	parameter b_op = `BUS_OP;
+
+
+	input [b_dat-1:0] a,b;
+	output [b_dat-1:0] rdo; 
 	output carry; 
 	output zero ; 
-	input [`BUS_OP_MSB:0] op ; 
-	wire [`BUS_DAT_MSB+1:0] resultado;
+	input [b_op-1:0] op ; 
+	wire [b_dat:0] resultado;
 
-	assign resultado = funcion_alu(a,b,op); 
-	//assign result = funcion_alu(a,b,cin,op); 
-	assign rdo = resultado[`BUS_DAT_MSB:0]; 
-	assign carry = resultado[8] ; 
-	assign zero = bandera_Z(resultado) ; 
+	assign resultado = funcion_alu(a,b,op);
+	assign rdo = resultado[b_dat-1:0]; 
+	assign carry = resultado[b_dat] ; 
+	assign zero = bandera_Z(rdo) ; 
 
-function [8:0] funcion_alu; 
-	input [`BUS_DAT_MSB:0] a,b ; 
-	//input cin ; 
-	input [`BUS_OP_MSB:0] op ; 
+function [b_dat:0] funcion_alu; 
+	input [b_dat-1:0] a,b ;
+	input [b_op-1:0] op ; 
 	case ( op ) 
-		`BUS_OP'b100000: funcion_alu = a + b;
-		`BUS_OP'b100010: funcion_alu = a - b;
-		`BUS_OP'b100100: funcion_alu = a & b;
-		`BUS_OP'b100101: funcion_alu = a | b;
-		`BUS_OP'b100110: funcion_alu = a ^ b;
-		`BUS_OP'b000011: funcion_alu = $signed(a) >>> 1;
-		`BUS_OP'b000010: funcion_alu = a >> 1;
-		`BUS_OP'b100111: funcion_alu = ~(a | b);
-		default : begin 
-			funcion_alu=`BUS_DAT+1'b000000000; 
+		`ADD: funcion_alu = a + b;
+		`SUB: funcion_alu = a - b;
+		`AND: funcion_alu = a & b;
+		`OR: funcion_alu = a | b;
+		`XOR: funcion_alu = a ^ b;
+		`SRA: funcion_alu = $signed(a) >>> b;
+		`SRL: funcion_alu = a >> b;
+		`NOR: funcion_alu = {1'b0,~(a | b)};//Soluciona problema con el carry que se levantaba con~(a|b) 
+		default : begin
+			funcion_alu = {b_dat+1{1'b0}};
 			$display("Operacion Ilegal Detectada!!"); 
 		end
 	endcase
 endfunction
 
 function bandera_Z ; 
-	input [`BUS_DAT_MSB+1:0] a8 ; 
-	begin 
-	bandera_Z = ~(a8[0]|a8[1]|a8[2]|a8[3]|a8[4]|a8[5]|a8[6]|a8[7]) ; // si todos los bits del rdo son ceros entonces pone la bandera en 1
+	input [b_dat-1:0] res ;
+	begin
+		bandera_Z = (res == {b_dat+1{1'b0}});
+	//bandera_Z = ~(a8[0]|a8[1]|a8[2]|a8[3]|a8[4]|a8[5]|a8[6]|a8[7]) ; // si todos los bits del rdo son ceros entonces pone la bandera en 1
 	end 
 endfunction 
 
