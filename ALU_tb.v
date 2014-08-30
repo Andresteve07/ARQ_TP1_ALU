@@ -21,7 +21,7 @@
 // Additional Comments:
 // 
 ////////////////////////////////////////////////////////////////////////////////
-
+`include "definiciones.vh"
 module ALU_tb;
 
 	// Inputs
@@ -48,64 +48,63 @@ module ALU_tb;
 		a = 0;
 		b = 0;
 		op = 0 ;
-		// Wait 100 ns for global reset to finish
+		// Espera 20ns por un reset global o el final
 		#20;
 
 //-------ADD-----------------------------//
 		a = 250;
 		b = 20;
-		op = 6'b100000 ;
-		// Wait 100 ns for global reset to finish
+		op = `ADD ;
+		// Espera 20ns por un reset global o el final
 		#20;
 //-------SUB-----------------------------//
 		a = 250;
 		b = 20;
-		op = 6'b100010 ;
-		// Wait 100 ns for global reset to finish
+		op = `SUB ;
+		// Espera 20ns por un reset global o el final
 		#20;
 //-------SUB_zero-----------------------------//
 		a = 250;
 		b = 250;
-		op = 6'b100010 ;
-		// Wait 100 ns for global reset to finish
+		op = `SUB ;
+		// Espera 20ns por un reset global o el final
 		#20;
 //-------AND-----------------------------//
 		a = 8'b10101010;
 		b = 8'b11110000;
-		op = 6'b100100 ;
-		// Wait 100 ns for global reset to finish
+		op = `AND ;
+		// Espera 20ns por un reset global o el final
 		#20;		
 //-------OR-----------------------------//
 		a = 8'b10101010;
 		b = 8'b11110000;
-		op = 6'b100101 ;
-		// Wait 100 ns for global reset to finish
+		op = `OR ;
+		// Espera 20ns por un reset global o el final
 		#20;		
 //-------XOR-----------------------------//
 		a = 8'b10101010;
 		b = 8'b11110000;
-		op = 6'b100110 ;
-		// Wait 100 ns for global reset to finish
+		op = `XOR ;
+		// Espera 20ns por un reset global o el final
 		#20;
 //-------NOR-----------------------------//
 		a = 8'b10101010;
 		b = 8'b11110000;
-		op = 6'b100111 ;
-		// Wait 100 ns for global reset to finish
+		op = `NOR ;
+		// Espera 20ns por un reset global o el final
 		#20;		
 //-------SRA-----------------------------//
 		a = 8'b11000000;
 		b = 8'b00000011;
-		op = 6'b000011 ;
-		// Wait 100 ns for global reset to finish
+		op = `SRA ;
+		// Espera 20ns por un reset global o el final
 		#20;		
 //-------SRL-----------------------------//
 		a = 8'b11000000;
 		b = 8'b00000011;
-		op = 6'b000010 ;
-		// Wait 100 ns for global reset to finish
-		#20;		
-		// Add stimulus here
+		op = `SRL ;
+		// Espera 20ns por un reset global o el final
+		#20; 
 
 	end
       

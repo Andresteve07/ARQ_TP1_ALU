@@ -1,6 +1,7 @@
 \documentclass[letterpaper]{sae}
 \usepackage[spanish]{babel}%Para el español
 \usepackage[utf8]{inputenc}%para los acentos
+\usepackage{times}
 \PaperTitle{Implementación de una ALU en verilog sobre FPGA Spartan3E}
 \AddAuthor{Morales Esteban, Salamandri Santiago, Uboldi Marino}{FCEFyN, UNC, Argentina}
 \PaperNumber{Trabajo Páctico Nro. 1}
@@ -8,19 +9,57 @@
 \usepackage{graphicx} % Required for including pictures
 \usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
 
+\usepackage{tikz}
+
 \graphicspath{{Imagenes/}}
 
 \usepackage{listings}
 \usepackage{color}
 \usepackage{textcomp}
-\definecolor{listinggray}{gray}{0.9}
-\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+%\definecolor{listinggray}{gray}{0.9}
+%\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+
+\usetikzlibrary{shadows}
+\usetikzlibrary{shapes.symbols}
+
+\def\codefont{
+%\fontspec{Courier New}
+\fontsize{9pt}{11pt}\selectfont}
+\definecolor{codebgcolor}{HTML}{EDEDED}
+\newenvironment{code}
+{\begin{center}
+\begin{tikzpicture}
+\node [%shade,%rellena el fondo con un gradiente
+	   %top color=black!1,%parametro de gradiente
+	   %bottom color=black!12,%parametro de gradiente
+	   draw,%dibuja la línea de contorno 
+	   %drop shadow,%dibuja una sombra
+	   fill=codebgcolor,%rellena el fondo con color plano
+	   rounded corners=5pt,	   
+	   ]
+\bgroup
+\bgroup\codefont
+\begin{tabular}{l}}
+{\end{tabular}
+\egroup
+\egroup;
+\end{tikzpicture}
+\end{center}}
+ 
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gris_oscuro}{rgb}{0.6,0.6,0.6}
+
+
+
 \lstset{
-	backgroundcolor=\color{lbcolor},
-	tabsize=4,
-	rulecolor=,
+	numbers = left,
+	numberstyle=\tiny\color{gray},  % the style that is used for the line-numbers
+	stepnumber=1,                   % the step between two line-numbers. If it's 1, each line will be numbered
+	numbersep=5pt,                  % how far the line-numbers are from the code
+	basicstyle=\footnotesize,%153,0,107
+	keywordstyle=\bfseries,%\color[rgb]{0,0,1} 0,0,230
+	commentstyle=\color[rgb]{0.4,0.4,0.4},%\color{gris_oscuro}
 	language=verilog,
-        basicstyle=\scriptsize,
         upquote=true,
         aboveskip={1.5\baselineskip},
         columns=fixed,
@@ -28,15 +67,30 @@
         extendedchars=true,
         breaklines=true,
         prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
-        frame=single,
-        showtabs=false,
-        showspaces=false,
-        showstringspaces=false,
-        identifierstyle=\ttfamily,
-        keywordstyle=\color[rgb]{0,0,1},
-        commentstyle=\color[rgb]{0.133,0.445,0.133},
-        stringstyle=\color[rgb]{0.627,0.126,0.941},
 }
+
+%\lstset{
+%	backgroundcolor=\color{lbcolor},
+%	tabsize=4,
+%	rulecolor=,
+%	language=verilog,
+%        basicstyle=\scriptsize,
+%        upquote=true,
+%        aboveskip={1.5\baselineskip},
+%        columns=fixed,
+%        showstringspaces=false,
+%        extendedchars=true,
+%        breaklines=true,
+%        prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+%        frame=single,
+%        showtabs=false,
+%        showspaces=false,
+%        showstringspaces=false,
+%        identifierstyle=\ttfamily,
+%        keywordstyle=\ttfamily\color[rgb]{0,0,1},
+%        commentstyle=\ttfamily\color[rgb]{0.133,0.445,0.133},
+%        stringstyle=\ttfamily\color[rgb]{0.627,0.126,0.941},
+%}
 
 \begin{document}
 \maketitle
@@ -162,53 +216,87 @@ y las salidas serán iguales a las salidas del otro.
 \section{Validación}
 A continuación se muestran los resultados de los testbench
 realizados sobre todas las operaciones implementadas, el código es el siguiente:
+\begin{code}
+{\fontfamily{\ttdefault}\selectfont
 \begin{lstlisting}
+`include "definiciones.vh"
 module ALU_tb;
 
 	// Inputs
-	reg [7:0] entrada;
-	reg boton_a;
-	reg boton_b;
-	reg boton_op;
+	reg [7:0] a;
+	reg [7:0] b;
+	reg [5:0] op;
 
 	// Outputs
 	wire [7:0] rdo;
 	wire carry;
 	wire zero;
 
-	// Instantiate the Unit Under Test (UUT)
-	calculadora uut (
-		.entrada(entrada), 
-		.boton_a(boton_a), 
-		.boton_b(boton_b), 
-		.boton_op(boton_op), 
+	alu #(8,6) uut(
+		.a(a), 
+		.b(b), 
+		.op(op), 
 		.rdo(rdo), 
 		.carry(carry), 
 		.zero(zero)
 	);
 
 	initial begin
-		// Initialize Inputs
-		entrada = 7;
-		boton_a = 1;
-		#20
-		boton_a = 0;
-		entrada = 5;
-		boton_b = 1;
-		#20
-		boton_b = 0;
-		entrada = 8'b00100000; //ADD
-		boton_op = 1;
-
-		// Wait 100 ns for global reset to finish
+		a = 0;
+		b = 0;
+		op = 0 ;
 		#20;
-        
-		// Add stimulus here
+//-------ADD-----------------------------//
+		a = 250;
+		b = 20;
+		op = `ADD ;
+		#20;
+//-------SUB-----------------------------//
+		a = 250;
+		b = 20;
+		op = `SUB ;
+		#20;
+//-------SUB_zero------------------------//
+		a = 250;
+		b = 250;
+		op = `SUB ;
+		#20;
+//-------AND-----------------------------//
+		a = 8'b10101010;
+		b = 8'b11110000;
+		op = `AND ;
+		#20;		
+//-------OR-----------------------------//
+		a = 8'b10101010;
+		b = 8'b11110000;
+		op = `OR ;
+		#20;		
+//-------XOR-----------------------------//
+		a = 8'b10101010;
+		b = 8'b11110000;
+		op = `XOR ;
+		#20;
+//-------NOR-----------------------------//
+		a = 8'b10101010;
+		b = 8'b11110000;
+		op = `NOR ;
+		#20;		
+//-------SRA-----------------------------//
+		a = 8'b11000000;
+		b = 8'b00000011;
+		op = `SRA ;
+		#20;		
+//-------SRL-----------------------------//
+		a = 8'b11000000;
+		b = 8'b00000011;
+		op = `SRL ;
+		#20; 
 
 	end
       
 endmodule
-\end{lstlisting}
+\end{lstlisting}}
+\end{code}
 
 Para las pruebas se fueron cambiando los valores de “entrada”, 
 para cargar los registros con los valores que prueben mejor cada una de las operaciones.
@@ -232,12 +320,10 @@ para cargar los registros con los valores que prueben mejor cada una de las oper
 	\end{tabular}
 \end{center}
 
+\vspace{5 mm}
+
 Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test1}}
-\label{fig:test1}
-\end{figure}
 
 \verb+SUB (binario 100010)+\\
 
@@ -258,11 +344,30 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 	\end{tabular}
 \end{center}
 
+\vspace{5 mm}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test2}}
-\label{fig:test2}
-\end{figure}
+Se agrega una resta que active la bandera de zero.
+
+\vspace{5 mm}
+
+\begin{center}
+	\begin{tabular}{|c|c|}
+		\hline 
+		Variable & Valor\tabularnewline
+		\hline 
+		\hline 
+		a & 250\tabularnewline
+		\hline 
+		b & 250\tabularnewline
+		\hline 
+		op & 100010\tabularnewline
+		\hline 
+		resultado & 0 + (zero)\tabularnewline
+		\hline 
+	\end{tabular}
+\end{center}
+
+\vspace{5 mm}
 
 \verb+AND (binario 100100)+\\
 
@@ -283,10 +388,7 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test3}}
-\label{fig:test3}
-\end{figure}
+\vspace{5 mm}
 
 \verb+OR (binario 100101)+\\
 
@@ -307,10 +409,7 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test4}}
-\label{fig:test4}
-\end{figure}
+\vspace{5 mm}
 
 \verb+XOR (binario 100110)+\\
 
@@ -331,10 +430,9 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test5}}
-\label{fig:test5}
-\end{figure}
+\vspace{5 mm}
+
+\newpage
 
 \verb+NOR (binario 100111)+\\
 
@@ -355,10 +453,7 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test6}}
-\label{fig:test6}
-\end{figure}
+\vspace{5 mm}
 
 \verb+SRA (binario 000011)+\\
 
@@ -368,45 +463,18 @@ Teniendo en cuenta el carry (256 por ser bit 9) mas 14 se tiene 270.
 		Variable & Valor\tabularnewline
 		\hline 
 		\hline 
-		a & 10101010\tabularnewline
+		a & 11000000\tabularnewline
 		\hline 
-		b & 11110000\tabularnewline
+		b & 00000011\tabularnewline
 		\hline 
 		op & 000011\tabularnewline
 		\hline 
-		resultado & 11000011\tabularnewline
+		resultado & 11111000\tabularnewline
 		\hline 
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test7}}
-\label{fig:test7}
-\end{figure}
-
-Tener en cuenta que el valor de b no se utiliza en esta operación, el shift siempre es de un bit. Además observar que se mantuvo el 1 en el bit mas significativo, en la próxima prueba se pone 0 como bit mas significativo de “a” para hacer énfasis en la diferencia.
-
-\begin{center}
-	\begin{tabular}{|c|c|}
-		\hline 
-		Variable & Valor\tabularnewline
-		\hline 
-		\hline 
-		a & 00000110\tabularnewline
-		\hline 
-		b & 11110000\tabularnewline
-		\hline 
-		op & 000011\tabularnewline
-		\hline 
-		resultado & 00000011\tabularnewline
-		\hline 
-	\end{tabular}
-\end{center}
-
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test8}}
-\label{fig:test8}
-\end{figure}
+\vspace{5 mm}
 
 \verb+SRL (binario 000010)+\\
 
@@ -416,24 +484,27 @@ Tener en cuenta que el valor de b no se utiliza en esta operación, el shift sie
 		Variable & Valor\tabularnewline
 		\hline 
 		\hline 
-		a & 10000110\tabularnewline
+		a & 11000000\tabularnewline
 		\hline 
-		b & 11110000\tabularnewline
+		b & 00000011\tabularnewline
 		\hline 
 		op & 000010\tabularnewline
 		\hline 
-		resultado & 10100000\tabularnewline
+		resultado & 00011000\tabularnewline
 		\hline 
 	\end{tabular}
 \end{center}
 
-\begin{figure}[H] % Example image
-\center{\includegraphics[height=0.4\textheight]{test9}}
-\label{fig:test9}
-\end{figure}
+\vspace{5 mm}
 
-Al igual que SRA el valor de “b” no se tiene en cuenta en la operación. 
-Observar que en este caso se relleno con cero lógico en vez de mantener el bit mas significativo.
+\newpage
+\subsection{Simulación}
+A continuación se muestran los resultados obtenidos de la simulación del testbench en ISim.
+
+\begin{figure}[H] % Example image
+\center{\includegraphics[height=0.8\textheight]{todas_test}}
+\label{fig:todas_test}
+\end{figure}
 
 \end{document}
 
